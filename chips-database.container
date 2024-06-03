@@ -1,0 +1,14 @@
+[Unit]
+Description=MariaDB database for CHIPS 
+After=local-fs.target
+
+[Container]
+ContainerName=chips-database
+EnvironmentFile=/opt/chips/config/chips-database.env
+Image=docker.io/library/mariadb:lts
+Network=host
+PodmanArgs=--publish-all
+Volume=/opt/chips/config/db/init:/docker-entrypoint-initdb.d:Z
+
+[Install]
+WantedBy=multi-user.target default.target

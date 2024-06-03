@@ -1,0 +1,12 @@
+[Unit]
+Description=Apache Guacamole server (guacd) for CHIPS
+After=local-fs.target
+
+[Container]
+ContainerName=chips-server
+Image=docker.io/guacamole/guacd:1.5.5
+Network=host
+PodmanArgs=--publish-all
+
+[Install]
+WantedBy=multi-user.target default.target

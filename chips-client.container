@@ -1,0 +1,14 @@
+[Unit]
+Description=Apache Guacamole client for CHIPS
+After=local-fs.target
+
+[Container]
+ContainerName=chips-client
+EnvironmentFile=/opt/chips/config/chips-client.env
+Image=docker.io/guacamole/guacamole:1.5.5
+Network=host
+PodmanArgs=--publish-all
+Volume=/opt/chips/artifacts/guac_home:/usr/local/src:Z
+
+[Install]
+WantedBy=multi-user.target default.target
