@@ -46,8 +46,8 @@ typeset -r DB_PORT=3306
 
 typeset -r DB_NAME=guac_db
 typeset -r DB_USER=guac_adm
-typeset -r DB_USER_PASSWORD=ers005sdguac
-typeset -r DB_ROOT_PASSWORD=ers005rtguac
+typeset -r DB_USER_PASSWORD=
+typeset -r DB_ROOT_PASSWORD=
 
 
 # create directory structure for configurations
