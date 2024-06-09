@@ -1,0 +1,1 @@
+podman build -f Dockerfile.eram -t ubi8/guacd:1.5.5. 2>&1 | tee run.log

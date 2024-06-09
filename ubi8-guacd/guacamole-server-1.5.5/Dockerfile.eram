@@ -1,0 +1,61 @@
+# The UBI8 Linux image that should be used as the basis for the guacd image
+ARG ubi8=latest
+FROM ubi8:${ubi8}
+
+# Copy source to container for sake of build
+ARG BUILD_DIR=/tmp/guacamole-server
+COPY . ${BUILD_DIR}
+
+RUN dnf -y install ${BUILD_DIR}/eram/rpms/*.rpm
+
+# Runtime environment
+ENV LC_ALL=C.UTF-8
+ENV GUACD_LOG_LEVEL=debug
+
+ARG PREFIX_DIR=/opt/guacamole
+
+WORKDIR /tmp/guacamole-server
+RUN autoreconf -fi && ./configure --prefix="$PREFIX_DIR" $GUACAMOLE_SERVER_OPTS
+RUN make 
+RUN make install
+RUN ldconfig
+
+# build eram plugin
+WORKDIR ${BUILD_DIR}/eram/plugin
+RUN chmod +x ./build.sh
+RUN ./build.sh
+RUN cp -v libguac-client-eramvnc.so /opt/guacamole/lib/.
+RUN ln -sf /opt/guacamole/lib/libguac-client-eramvnc.so /opt/guacamole/lib/libguac-client-vnc.so
+
+RUN ldd /opt/guacamole/lib/libguac-client-vnc.so
+RUN cksum libguac-client-eramvnc.so
+RUN cksum /opt/guacamole/lib/libguac-client-vnc.so.0.0.0
+
+# cleanup
+RUN dnf clean all
+WORKDIR /opt/guacamole
+RUN rm -rf /tmp/guacamole-server
+
+# Checks the operating status every 5 minutes with a timeout of 5 seconds
+HEALTHCHECK --interval=5m --timeout=5s CMD nc -z 127.0.0.1 4822 || exit 1
+
+# Create a new user guacd
+ARG UID=1000
+ARG GID=1000
+RUN groupadd --gid $GID guacd
+RUN useradd --system --create-home --shell /sbin/nologin --uid $UID --gid $GID guacd
+
+
+# Run with user guacd
+USER guacd
+
+# Expose the default listener port
+EXPOSE 4822
+
+# Start guacd, listening on port 0.0.0.0:4822
+#
+# Note the path here MUST correspond to the value specified in the 
+# PREFIX_DIR build argument.
+#
+CMD /opt/guacamole/sbin/guacd -b 0.0.0.0 -L $GUACD_LOG_LEVEL -f
+
