@@ -4,7 +4,7 @@ After=local-fs.target
 
 [Container]
 ContainerName=chips-server
-Image=docker.io/guacamole/guacd:1.5.5
+Image=localhost/ubi8/guacd:1.5.5
 Network=host
 PodmanArgs=--publish-all
 

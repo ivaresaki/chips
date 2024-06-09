@@ -9,6 +9,7 @@ Image=docker.io/library/mariadb:lts
 Network=host
 PodmanArgs=--publish-all
 Volume=/opt/chips/config/db/init:/docker-entrypoint-initdb.d:Z
+Volume=/opt/chips/data:/var/lib/mysql:Z
 
 [Install]
 WantedBy=multi-user.target default.target
